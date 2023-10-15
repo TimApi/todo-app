@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { ITodoItem } from '@/interface/TodoInterface'
 import { computed, ref } from 'vue'
-import type { ITodo } from '@/views/HomeView.vue'
 
 const isClicked = ref(false)
-const todo = ref<ITodo>("")
+const todo = ref<ITodoItem | ''>('')
 
 const setbackground = computed(() => {
   if (!isClicked.value) {
@@ -14,12 +14,14 @@ const setbackground = computed(() => {
 })
 
 const emit = defineEmits<{
-  (e: 'todo', id: ITodo): void
+  (e: 'todo', todoItem: ITodoItem): void
 }>()
 
-
 const emitTodo = () => {
-  emit('todo', todo.value)
+  if (todo.value) {
+    emit('todo', todo.value)
+  }
+  todo.value = ''
 }
 </script>
 

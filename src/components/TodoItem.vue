@@ -1,22 +1,50 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { ITodoItem } from '@/interface/TodoInterface'
 
 const isClicked = ref(false)
 
-const setbackground = computed(() => {
+const props = defineProps<{
+  todo: ITodoItem
+}>()
+
+const finishTodo = computed(() => {
   if (!isClicked.value) {
-    return 'bg-transparent'
+    return ''
   } else {
-    return `bg-icon-check bg-[background-size: 20px, 20px] bg-no-repeat bg-red-500`
+    return 'line-through opacity-30'
   }
 })
+
+const completedTodo = (todo: ITodoItem) => {
+  isClicked.value = !isClicked.value
+  emit('finishedTodo', todo)
+}
+
+const emit = defineEmits<{
+  (e: 'emitTodo', emitTodo: ITodoItem): void
+  (e: 'finishedTodo', finishedTodo: ITodoItem): void
+}>()
+
+const emitTodoItem = (item: ITodoItem) => {
+  emit('emitTodo', item)
+}
 </script>
 
 <template>
-  <div class="flex bg-white w-fit py-0.5 px-4 rounded items-center">
-    <div
-      class="w-4 h-4 rounded-full border-solid border flex-shrink-0 flex border-blue-dark"
-    ></div>
-    <p>test</p>
-  </div>
+  <button @click="completedTodo(todo)" class="flex bg-white py-2 px-4 rounded items-center w-full">
+    <div class="flex justify-between w-full items-center">
+      <div class="flex items-center">
+        <div
+          class="w-4 h-4 rounded-full border-solid border flex-shrink-0 flex border-blue-dark mr-2"
+        ></div>
+        <p :class="finishTodo">{{ todo }}</p>
+      </div>
+      <img
+        @click="emitTodoItem(todo)"
+        class="h-3 w-3 z-50"
+        src="../../public/images/icon-cross.svg"
+      />
+    </div>
+  </button>
 </template>
