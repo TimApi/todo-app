@@ -16,11 +16,6 @@ const finishTodo = computed(() => {
   }
 })
 
-const completedTodo = (todo: ITodoItem) => {
-  isClicked.value = !isClicked.value
-  emit('finishedTodo', todo)
-}
-
 const emit = defineEmits<{
   (e: 'emitTodo', emitTodo: ITodoItem): void
   (e: 'finishedTodo', finishedTodo: ITodoItem): void
@@ -32,13 +27,13 @@ const emitTodoItem = (item: ITodoItem) => {
 </script>
 
 <template>
-  <button @click="completedTodo(todo)" class="flex bg-white py-2 px-4 rounded items-center w-full">
+  <button @click="emitTodoItem(todo)" class="flex bg-white py-2 px-4 rounded items-center w-full">
     <div class="flex justify-between w-full items-center">
       <div class="flex items-center">
         <div
           class="w-4 h-4 rounded-full border-solid border flex-shrink-0 flex border-blue-dark mr-2"
         ></div>
-        <p :class="finishTodo">{{ todo }}</p>
+        <p :class="finishTodo">{{ todo.text }}</p>
       </div>
       <img
         @click="emitTodoItem(todo)"

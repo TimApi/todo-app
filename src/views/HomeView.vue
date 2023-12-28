@@ -1,28 +1,41 @@
 <script setup lang="ts">
 import inputVue from '@/components/Input.vue'
-import todoItem from '@/components/TodoItem.vue'
 import Footer from '../components/Footer.vue'
-import type { ITodoItem } from '../interface/TodoInterface'
-import { ref } from 'vue'
+import TodoList from '@/components/TodoList.vue'
+import type { ITodoItem, IListType } from '../interface/TodoInterface'
+import { computed, ref } from 'vue'
 
-const todoList = ref<ITodoItem[]>([])
-const todoCompleted = ref<ITodoItem[]>([])
+const activeListType = ref<IListType>('activeTodoList')
+const todoActiveList = ref<ITodoItem[]>([])
+const todoCompletedList = ref<ITodoItem[]>([])
 
-const addTodo = (todoItem: ITodoItem) => {
-  if (todoList) todoList.value.push(todoItem)
-}
-
-const removeTodoItem = (item: ITodoItem) => {
-  const index = todoList.value.indexOf(item)
-  if (index > -1) {
-    todoList.value.splice(index, 1)
+const addTodo = (item: ITodoItem) => {
+  if (item.listType === 'activeTodoList') {
+    todoActiveList.value.push(item)
   }
 }
 
-const finishedTodo = (todo: ITodoItem) => {
-  console.log(todo)
-  console.log(todoCompleted.value)
-  todoCompleted.value.push(todo)
+const removeTodoItem = (item: ITodoItem) => {
+  if (item.listType === 'activeTodoList') {
+    const index = todoActiveList.value.indexOf(item)
+    if (index > -1) {
+      todoActiveList.value.splice(index, 1)
+    }
+    todoCompletedList.value.push(item)
+  }
+}
+
+const setListActiveListType = (activeListItem: IListType) => {
+  activeListType.value = activeListItem
+}
+
+const allTodos = computed(() => {
+  const allTodoArray = todoActiveList.value.concat(todoCompletedList.value)
+  return new Set(allTodoArray)
+})
+
+const clearTodoList = () => {
+  todoCompletedList.value = []
 }
 </script>
 
@@ -40,21 +53,24 @@ const finishedTodo = (todo: ITodoItem) => {
       </div>
     </header>
     <div class="container">
-      <div
-        class="shadow-black/80 w-full -mt-6 flex flex-col justify-center"
-        v-if="todoList.length >= 1"
-      >
-        <ul class="w-full">
-          <li
-            class="w-full border-b-2 border-solid border-gray"
-            v-for="(todo, index) in todoList"
-            :key="index"
-          >
-            <todoItem @emit-todo="removeTodoItem" @finished-todo="finishedTodo" :todo="todo" />
-          </li>
-        </ul>
-        <Footer :todo-list="todoList" />
+      <div>
+        <TodoList
+          v-if="activeListType === 'activeTodoList'"
+          @remove-todo-item="removeTodoItem"
+          :todo-list="todoActiveList"
+        />
+        <TodoList
+          v-else-if="activeListType === 'CompletedTodoList'"
+          @remove-todo-item="removeTodoItem"
+          :todo-list="todoCompletedList"
+        />
+        <TodoList v-else @remove-todo-item="removeTodoItem" :todo-list="allTodos" />
       </div>
     </div>
+    <Footer
+      :todo-list="todoActiveList"
+      @active-list-type="setListActiveListType"
+      @clear-completed="clearTodoList"
+    />
   </main>
 </template>

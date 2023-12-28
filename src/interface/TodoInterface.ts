@@ -1,7 +1,12 @@
 export interface ITodoItem {
-    text: string
-    isCompleted: false
-    isActive: false
+  text: string
+  listType: IListType
 }
 
+export type IListType = (typeof IActiveList)[keyof typeof IActiveList]
 
+export const IActiveList = {
+  allTodos: 'allTodo',
+  activelist: 'activeTodoList',
+  completedList: 'CompletedTodoList'
+} as const

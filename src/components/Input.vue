@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { ITodoItem } from '@/interface/TodoInterface'
+import type { IListType, ITodoItem } from '@/interface/TodoInterface'
 import { computed, ref } from 'vue'
 
 const isClicked = ref(false)
-const todo = ref<ITodoItem | ''>('')
+const todo = ref('')
+const listType = ref<IListType>('activeTodoList')
 
 const setbackground = computed(() => {
   if (!isClicked.value) {
@@ -19,9 +20,14 @@ const emit = defineEmits<{
 
 const emitTodo = () => {
   if (todo.value) {
-    emit('todo', todo.value)
+    const todoItem: ITodoItem = {
+      text: todo.value,
+      listType: listType.value
+    }
+    emit('todo', todoItem)
   }
   todo.value = ''
+
 }
 </script>
 
